@@ -1,3 +1,6 @@
 [submodule "SVGA-Format"]
 	path = SVGA-Format
 	url = https://github.com/svga/SVGA-Format
+[submodule "zipper"]
+	path = zipper
+	url = https://github.com/sebastiandev/zipper
