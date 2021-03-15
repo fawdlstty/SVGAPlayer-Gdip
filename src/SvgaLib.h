@@ -1,13 +1,12 @@
 ﻿#ifndef __SVGALIB_H__
 #define __SVGALIB_H__
 
-#define SVGALIB_USE_GDIPLUS
-
 #include <cstdint>
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 #ifdef _WIN32
 #	define NOMINMAX
@@ -22,27 +21,15 @@ namespace SvgaLib {
 	// Platform abstraction
 	//
 
-#if defined SVGALIB_USE_GDIPLUS
-	typedef Gdiplus::Bitmap *Image_t;
-#else
+#ifndef SVGALIB_IMAKEENGINE_IMPL
 	typedef void *Image_t;
+	typedef void *RectF_t;
+	typedef void *Transform_t;
 #endif
 
 	class ImageEngine_t {
 	public:
-		// TODO: 貌似可以不要这玩意
-		//static void Init () { _get_obj (); }
-		static Image_t LoadFromMemory (const char *_data, size_t _size) { return _get_obj ()->LoadFromMemory (_data, _size); }
-
-	private:
-		static _IImageEngineSingleton_t *_get_obj () {
-#if defined SVGALIB_USE_GDIPLUS
-			static ImageEngineGdip_t s_gdip;
-			return &s_gdip;
-#else
-			return nullptr;
-#endif
-		}
+		static Image_t* LoadFromMemory (const char *_data, size_t _size);
 	};
 
 
@@ -51,10 +38,28 @@ namespace SvgaLib {
 	// Implement
 	//
 
-	class SvgaAnimation: public std::enable_shared_from_this<SvgaAnimation> {
+	class SvgaVideoSpriteFrame_t: public std::enable_shared_from_this<SvgaVideoSpriteFrame_t> {
 	public:
-		SvgaAnimation () = default;
-		~SvgaAnimation () { Stop (); }
+		SvgaVideoSpriteFrame_t ();
+		~SvgaVideoSpriteFrame_t ();
+		float m_alpha;
+		RectF_t m_layout;
+		Transform_t m_transform;
+		std::string m_clipPath;
+	};
+
+	class SvgaVideoSprite_t: public std::enable_shared_from_this<SvgaVideoSprite_t> {
+	public:
+		SvgaVideoSprite_t ();
+		~SvgaVideoSprite_t ();
+		std::string m_image_key;
+		std::vector< std::shared_ptr<SvgaVideoSpriteFrame_t>> m_frames;
+	};
+
+	class SvgaVideo_t: public std::enable_shared_from_this<SvgaVideo_t> {
+	public:
+		SvgaVideo_t ();
+		~SvgaVideo_t ();
 		void StartPlay (std::function<void ()>);
 		void Stop ();
 		bool IsPlaying ();
@@ -62,16 +67,17 @@ namespace SvgaLib {
 		std::string m_version;
 		float m_width, m_height;
 		int32_t m_fps, m_frames;
-		std::map<std::string, Image_t> m_images;
+		std::map<std::string, Image_t*> m_images;
+		std::vector<std::shared_ptr<SvgaVideoSprite_t>> m_sprites;
 	};
 
-	class SvgaLoader {
+	class SvgaLoader_t {
 	public:
-		static std::shared_ptr<SvgaAnimation> LoadFromMemory (const char *_bytes, size_t _size);
-		static std::shared_ptr<SvgaAnimation> LoadFromFile (const std::string _path);
+		static std::shared_ptr<SvgaVideo_t> LoadFromMemory (const char *_bytes, size_t _size);
+		static std::shared_ptr<SvgaVideo_t> LoadFromFile (const std::string _path);
 #ifdef _WIN32
-		static std::shared_ptr<SvgaAnimation> LoadFromResourceA (HINSTANCE _inst, LPCSTR _type, LPCSTR _name);
-		static std::shared_ptr<SvgaAnimation> LoadFromResourceW (HINSTANCE _inst, LPCWSTR _type, LPCWSTR _name);
+		static std::shared_ptr<SvgaVideo_t> LoadFromResourceA (HINSTANCE _inst, LPCSTR _type, LPCSTR _name);
+		static std::shared_ptr<SvgaVideo_t> LoadFromResourceW (HINSTANCE _inst, LPCWSTR _type, LPCWSTR _name);
 #endif
 	};
 }

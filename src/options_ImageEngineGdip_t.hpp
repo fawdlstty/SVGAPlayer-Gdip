@@ -1,5 +1,5 @@
-#ifndef __OPTIONS_GDIP_HPP__
-#define __OPTIONS_GDIP_HPP__
+#ifndef __OPTIONS_IMAGEENGINEGDIP_HPP__
+#define __OPTIONS_IMAGEENGINEGDIP_HPP__
 
 #define NOMINMAX
 #define _WIN32_WINNT _WIN32_WINNT_WIN7
@@ -15,7 +15,37 @@
 #undef min
 #undef max
 
-#include "options_interface.h"
+
+
+#define SVGALIB_IMAKEENGINE_IMPL ImageEngineGdip_t
+typedef Gdiplus::Bitmap Image_t;
+typedef Gdiplus::RectF RectF_t;
+struct Transform_t {
+	Transform_t () {
+		m_a = m_b = m_c = m_d = m_tx = m_ty = 0;
+	}
+	Transform_t (float a, float b, float c, float d, float tx, float ty)
+		: m_a (a), m_b (b), m_c (c), m_d (d), m_tx (tx), m_ty (ty) {}
+	Transform_t (const Transform_t &_obj) {
+		m_a = _obj.m_a;
+		m_b = _obj.m_b;
+		m_c = _obj.m_c;
+		m_d = _obj.m_d;
+		m_tx = _obj.m_tx;
+		m_ty = _obj.m_ty;
+	}
+	Transform_t &operator= (const Transform_t &_obj) {
+		m_a = _obj.m_a;
+		m_b = _obj.m_b;
+		m_c = _obj.m_c;
+		m_d = _obj.m_d;
+		m_tx = _obj.m_tx;
+		m_ty = _obj.m_ty;
+	}
+	float m_a, m_b, m_c, m_d, m_tx, m_ty;
+};
+
+#include "options_IImageEngineSingleton_t.h"
 
 
 
@@ -32,7 +62,7 @@ namespace SvgaLib {
 			Gdiplus::GdiplusShutdown (s_token);
 		}
 
-		Gdiplus::Bitmap *LoadFromMemory (const char *_data, size_t _size) override {
+		Gdiplus::Bitmap* LoadFromMemory (const char *_data, size_t _size) override {
 			IStream *_stm = nullptr;
 			CreateStreamOnHGlobal (NULL, TRUE, &_stm);
 			_stm->Seek (LARGE_INTEGER { 0 }, STREAM_SEEK_SET, NULL);
@@ -49,4 +79,4 @@ namespace SvgaLib {
 	};
 }
 
-#endif //__OPTIONS_GDIP_HPP__
+#endif //__OPTIONS_IMAGEENGINEGDIP_HPP__
