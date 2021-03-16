@@ -3,7 +3,7 @@
 
 
 namespace SvgaLib {
-	static std::shared_ptr<SvgaVideo_t> __parse_SvgaVideo_t_v2 (const com::opensource::svga::MovieEntity &_me) {
+	std::shared_ptr<SvgaVideo_t> __parse_SvgaVideo_t_v2 (const com::opensource::svga::MovieEntity &_me) {
 		auto _ptr = std::make_shared<SvgaVideo_t> ();
 		_ptr->m_version = _me.version ();
 		_ptr->m_width = _me.params ().viewboxwidth ();
@@ -36,7 +36,7 @@ namespace SvgaLib {
 
 
 
-	void SvgaVideo_t::StartPlay (std::function<void ()>) {
+	void SvgaVideo_t::StartPlay (std::function<void (Image_t *_img)>) {
 		// TODO
 	}
 

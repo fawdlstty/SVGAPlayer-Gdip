@@ -25,11 +25,15 @@ namespace SvgaLib {
 	typedef void *Image_t;
 	typedef void *RectF_t;
 	typedef void *Transform_t;
+	typedef void *Window_t;
 #endif
 
 	class ImageEngine_t {
 	public:
 		static Image_t* LoadFromMemory (const char *_data, size_t _size);
+		static Window_t CreatePreviewWindow (int32_t _width, int32_t _height);
+		static int Run (Window_t _wnd);
+		static bool PaintImage (Window_t _wnd, Image_t *_img);
 	};
 
 
@@ -38,46 +42,46 @@ namespace SvgaLib {
 	// Implement
 	//
 
-	class SvgaVideoSpriteFrame_t: public std::enable_shared_from_this<SvgaVideoSpriteFrame_t> {
+	class ISvgaVideoSpriteFrame_t: public std::enable_shared_from_this<ISvgaVideoSpriteFrame_t> {
 	public:
-		SvgaVideoSpriteFrame_t ();
-		~SvgaVideoSpriteFrame_t ();
-		float m_alpha;
+		ISvgaVideoSpriteFrame_t () = default;
+		virtual ~ISvgaVideoSpriteFrame_t () = default;
+		float m_alpha = 0.0f;
 		RectF_t m_layout;
 		Transform_t m_transform;
-		std::string m_clipPath;
+		std::string m_clipPath = "";
 	};
 
-	class SvgaVideoSprite_t: public std::enable_shared_from_this<SvgaVideoSprite_t> {
+	class ISvgaVideoSprite_t: public std::enable_shared_from_this<ISvgaVideoSprite_t> {
 	public:
-		SvgaVideoSprite_t ();
-		~SvgaVideoSprite_t ();
-		std::string m_image_key;
-		std::vector< std::shared_ptr<SvgaVideoSpriteFrame_t>> m_frames;
+		ISvgaVideoSprite_t () = default;
+		virtual ~ISvgaVideoSprite_t () = default;
+		std::string m_image_key = "";
+		std::vector<std::shared_ptr<ISvgaVideoSpriteFrame_t>> m_frames;
 	};
 
-	class SvgaVideo_t: public std::enable_shared_from_this<SvgaVideo_t> {
+	class ISvgaVideo_t: public std::enable_shared_from_this<ISvgaVideo_t> {
 	public:
-		SvgaVideo_t ();
-		~SvgaVideo_t ();
-		void StartPlay (std::function<void ()>);
-		void Stop ();
-		bool IsPlaying ();
+		ISvgaVideo_t () = default;
+		virtual ~ISvgaVideo_t () = default;
+		virtual void StartPlay (std::function<void (Image_t*)>) = 0;
+		virtual void Stop () = 0;
+		virtual bool IsPlaying () = 0;
 
-		std::string m_version;
-		float m_width, m_height;
-		int32_t m_fps, m_frames;
+		std::string m_version = "";
+		float m_width = 0.0f, m_height = 0.0f;
+		int32_t m_fps = 0, m_frames = 0;
 		std::map<std::string, Image_t*> m_images;
-		std::vector<std::shared_ptr<SvgaVideoSprite_t>> m_sprites;
+		std::vector<std::shared_ptr<ISvgaVideoSprite_t>> m_sprites;
 	};
 
 	class SvgaLoader_t {
 	public:
-		static std::shared_ptr<SvgaVideo_t> LoadFromMemory (const char *_bytes, size_t _size);
-		static std::shared_ptr<SvgaVideo_t> LoadFromFile (const std::string _path);
+		static std::shared_ptr<ISvgaVideo_t> LoadFromMemory (const char *_bytes, size_t _size);
+		static std::shared_ptr<ISvgaVideo_t> LoadFromFile (const std::string _path);
 #ifdef _WIN32
-		static std::shared_ptr<SvgaVideo_t> LoadFromResourceA (HINSTANCE _inst, LPCSTR _type, LPCSTR _name);
-		static std::shared_ptr<SvgaVideo_t> LoadFromResourceW (HINSTANCE _inst, LPCWSTR _type, LPCWSTR _name);
+		static std::shared_ptr<ISvgaVideo_t> LoadFromResourceA (HINSTANCE _inst, LPCSTR _type, LPCSTR _name);
+		static std::shared_ptr<ISvgaVideo_t> LoadFromResourceW (HINSTANCE _inst, LPCWSTR _type, LPCWSTR _name);
 #endif
 	};
 }

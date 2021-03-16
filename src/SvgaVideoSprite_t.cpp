@@ -3,7 +3,7 @@
 
 
 namespace SvgaLib {
-	static std::shared_ptr<SvgaVideoSprite_t> __parse_SvgaVideoSprite_t_v2 (const com::opensource::svga::SpriteEntity &_se) {
+	std::shared_ptr<SvgaVideoSprite_t> __parse_SvgaVideoSprite_t_v2 (const com::opensource::svga::SpriteEntity &_se) {
 		auto _ptr = std::make_shared<SvgaVideoSprite_t> ();
 		_ptr->m_image_key = _se.imagekey ();
 		_ptr->m_frames.reserve (_se.frames_size ());

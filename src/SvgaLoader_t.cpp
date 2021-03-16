@@ -8,8 +8,13 @@ namespace SvgaLib {
 			return nullptr;
 		if (_bytes [0] == (char) 80 && _bytes [1] == (char) 75 && _bytes [2] == (char) 3 && _bytes [3] == (char) 4) {
 			// version 1
-			// // TODO
 			//zipper::Unzipper _unz (_bytes);
+			//std::vector<zipper::ZipEntry> _vze = _unz.entries ();
+			//std::vector<uint8_t> _vdata;
+			//if (!_unz.extractEntryToMemory ("movie.spec", _vdata))
+			//	return nullptr;
+			// TODO
+			//auto _ret = __parse_SvgaVideo_t_v1 (_vdata);
 		} else {
 			// version 2
 			std::stringstream _ss;
