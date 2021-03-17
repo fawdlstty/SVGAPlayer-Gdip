@@ -14,6 +14,8 @@ namespace SvgaLib {
 		virtual Window_t CreatePreviewWindow (int32_t _width, int32_t _height) = 0;
 		virtual int Run (Window_t _wnd) = 0;
 		virtual bool PaintImage (Window_t _wnd, Image_t *_img) = 0;
+		virtual Image_t *CreateImage (int32_t _width, int32_t _height) = 0;
+		virtual void FreeImage (Image_t *_img) = 0;
 	};
 }
 

@@ -3,7 +3,7 @@
 
 
 namespace SvgaLib {
-	std::shared_ptr<SvgaVideo_t> SvgaLoader_t::LoadFromMemory (const char *_bytes, size_t _size) {
+	std::shared_ptr<ISvgaVideo_t> SvgaLoader_t::LoadFromMemory (const char *_bytes, size_t _size) {
 		if (_size < 4)
 			return nullptr;
 		if (_bytes [0] == (char) 80 && _bytes [1] == (char) 75 && _bytes [2] == (char) 3 && _bytes [3] == (char) 4) {
@@ -31,7 +31,7 @@ namespace SvgaLib {
 
 
 
-	std::shared_ptr<SvgaVideo_t> SvgaLoader_t::LoadFromFile (const std::string _path) {
+	std::shared_ptr<ISvgaVideo_t> SvgaLoader_t::LoadFromFile (const std::string _path) {
 		std::ifstream _ifs (_path, std::ios::binary);
 		//std::string str ((std::istreambuf_iterator<char> (_ifs)), std::istreambuf_iterator<char> ());
 		_ifs.seekg (0, std::ios::end);
@@ -47,11 +47,10 @@ namespace SvgaLib {
 
 
 #ifdef _WIN32
-	std::shared_ptr<SvgaVideo_t> SvgaLoader_t::LoadFromResourceA (HINSTANCE _inst, LPCSTR _type, LPCSTR _name) {
-		std::shared_ptr<SvgaVideo_t> _ret = nullptr;
+	std::shared_ptr<ISvgaVideo_t> SvgaLoader_t::LoadFromResourceA (HINSTANCE _inst, LPCSTR _type, LPCSTR _name) {
+		std::shared_ptr<ISvgaVideo_t> _ret = nullptr;
 		HRSRC hRsrc = ::FindResourceA (_inst, _name, _type);
 		if (hRsrc) {
-			DWORD dwSize = 0;
 			HGLOBAL hGlobal = ::LoadResource (_inst, hRsrc);
 			if (hGlobal) {
 				DWORD dwSize = ::SizeofResource (_inst, hRsrc);
@@ -68,11 +67,10 @@ namespace SvgaLib {
 
 
 
-	std::shared_ptr<SvgaVideo_t> SvgaLoader_t::LoadFromResourceW (HINSTANCE _inst, LPCWSTR _type, LPCWSTR _name) {
-		std::shared_ptr<SvgaVideo_t> _ret = nullptr;
+	std::shared_ptr<ISvgaVideo_t> SvgaLoader_t::LoadFromResourceW (HINSTANCE _inst, LPCWSTR _type, LPCWSTR _name) {
+		std::shared_ptr<ISvgaVideo_t> _ret = nullptr;
 		HRSRC hRsrc = ::FindResourceW (_inst, _name, _type);
 		if (hRsrc) {
-			DWORD dwSize = 0;
 			HGLOBAL hGlobal = ::LoadResource (_inst, hRsrc);
 			if (hGlobal) {
 				DWORD dwSize = ::SizeofResource (_inst, hRsrc);

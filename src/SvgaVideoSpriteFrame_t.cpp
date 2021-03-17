@@ -3,8 +3,22 @@
 
 
 namespace SvgaLib {
-	std::shared_ptr<SvgaVideoSpriteFrame_t> __parse_SvgaVideoSpriteFrame_t_v2 (const com::opensource::svga::FrameEntity &_fe) {
-		auto _ptr = std::make_shared<SvgaVideoSpriteFrame_t> ();
+	class SvgaVideoSpriteFrameImpl_t : public ISvgaVideoSpriteFrame_t {
+	public:
+		SvgaVideoSpriteFrameImpl_t () = default;
+
+		virtual ~SvgaVideoSpriteFrameImpl_t () = default;
+
+		float m_alpha = 0.0f;
+		RectF_t m_layout;
+		Transform_t m_transform;
+		std::string m_clipPath = "";
+	};
+
+
+
+	std::shared_ptr<ISvgaVideoSpriteFrame_t> __parse_SvgaVideoSpriteFrame_t_v2 (const com::opensource::svga::FrameEntity &_fe) {
+		auto _ptr = std::make_shared<SvgaVideoSpriteFrameImpl_t> ();
 		_ptr->m_alpha = _fe.alpha ();
 		float x = 0.0f;
 		float y = 0.0f;
@@ -36,15 +50,5 @@ namespace SvgaLib {
 		//
 		_ptr->m_clipPath = _fe.clippath ();
 		return _ptr;
-	}
-
-
-
-	SvgaVideoSpriteFrame_t::SvgaVideoSpriteFrame_t () {
-	}
-
-
-
-	SvgaVideoSpriteFrame_t::~SvgaVideoSpriteFrame_t () {
 	}
 }

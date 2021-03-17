@@ -1,6 +1,10 @@
 #ifndef __OPTIONS_IMAGEENGINEGDIP_HPP__
 #define __OPTIONS_IMAGEENGINEGDIP_HPP__
 
+#include <map>
+#include <mutex>
+#include <vector>
+
 #define NOMINMAX
 #define _WIN32_WINNT _WIN32_WINNT_WIN7
 #include <Windows.h>
@@ -22,29 +26,16 @@
 typedef Gdiplus::Bitmap Image_t;
 typedef Gdiplus::RectF RectF_t;
 struct Transform_t {
-	Transform_t () {
-		m_a = m_b = m_c = m_d = m_tx = m_ty = 0;
-	}
-	Transform_t (float a, float b, float c, float d, float tx, float ty)
-		: m_a (a), m_b (b), m_c (c), m_d (d), m_tx (tx), m_ty (ty) {}
+	Transform_t () = default;
+	Transform_t (float a, float b, float c, float d, float tx, float ty): m_a (a), m_b (b), m_c (c), m_d (d), m_tx (tx), m_ty (ty) {}
 	Transform_t (const Transform_t &_obj) {
-		m_a = _obj.m_a;
-		m_b = _obj.m_b;
-		m_c = _obj.m_c;
-		m_d = _obj.m_d;
-		m_tx = _obj.m_tx;
-		m_ty = _obj.m_ty;
+		std::tie (m_a, m_b, m_c, m_d, m_tx, m_ty) = std::make_tuple (_obj.m_a, _obj.m_b, _obj.m_c, _obj.m_d, _obj.m_tx, _obj.m_ty);
 	}
 	Transform_t& operator= (const Transform_t &_obj) {
-		m_a = _obj.m_a;
-		m_b = _obj.m_b;
-		m_c = _obj.m_c;
-		m_d = _obj.m_d;
-		m_tx = _obj.m_tx;
-		m_ty = _obj.m_ty;
+		std::tie (m_a, m_b, m_c, m_d, m_tx, m_ty) = std::make_tuple (_obj.m_a, _obj.m_b, _obj.m_c, _obj.m_d, _obj.m_tx, _obj.m_ty);
 		return *this;
 	}
-	float m_a, m_b, m_c, m_d, m_tx, m_ty;
+	float m_a = 0, m_b = 0, m_c = 0, m_d = 0, m_tx = 0, m_ty = 0;
 };
 typedef HWND Window_t;
 
@@ -62,6 +53,12 @@ namespace SvgaLib {
 		}
 
 		virtual ~ImageEngineGdip_t () {
+			for (std::pair<const int64_t, std::vector<Image_t*>> &_item : m_caches) {
+				for (Image_t *_img : _item.second) {
+					delete _img;
+				}
+				_item.second.clear ();
+			}
 			if (m_wcex.lpfnWndProc) {
 				::RegisterClassEx (&m_wcex);
 				m_wcex.lpfnWndProc = NULL;
@@ -129,15 +126,41 @@ namespace SvgaLib {
 				return false;
 			HDC _hdc = ::GetDC (_wnd);
 			Gdiplus::Graphics _g (_hdc);
-			Gdiplus::Rect _rc { 0, 0, _img->GetWidth (), _img->GetHeight () };
+			Gdiplus::Rect _rc { 0, 0, (INT) _img->GetWidth (), (INT) _img->GetHeight () };
 			_g.DrawImage (_img, _rc, 0, 0, _img->GetWidth (), _img->GetHeight (), Gdiplus::UnitPixel);
 			return true;
+		}
+
+		Image_t *CreateImage (int32_t _width, int32_t _height) override {
+			std::unique_lock<std::mutex> ul (m_mtx);
+			int64_t _wh = _width | ((int64_t) _height << 32);
+			if (m_caches.find (_wh) == m_caches.end ())
+				m_caches [_wh] = std::vector<Image_t *> ();
+			auto& _v = m_caches [_wh];
+			if (_v.size () > 0) {
+				auto _ret = _v [_v.size () - 1];
+				_v.erase (_v.begin () + _v.size () - 1);
+				return _ret;
+			}
+			ul.unlock ();
+			return new Gdiplus::Bitmap (_width, _height, PixelFormat32bppARGB);
+		}
+
+		void FreeImage (Image_t *_img) override {
+			std::unique_lock<std::mutex> ul (m_mtx);
+			int64_t _width = _img->GetWidth ();
+			int64_t _height = _img->GetHeight ();
+			int64_t _wh = _width | (_height << 32);
+			m_caches [_wh].push_back (_img);
 		}
 
 	private:
 		ULONG_PTR m_token;
 		WNDCLASSEX m_wcex { sizeof (WNDCLASSEX) };
 		bool m_running = false;
+
+		std::mutex m_mtx;
+		std::map<int64_t, std::vector<Image_t *>> m_caches;
 
 		static LRESULT CALLBACK WndProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			//if (uMsg == WM_CLOSE) {

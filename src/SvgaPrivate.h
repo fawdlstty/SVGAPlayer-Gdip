@@ -13,6 +13,7 @@
 
 
 
+#include <atomic>
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -23,13 +24,13 @@
 #include <vector>
 
 namespace SvgaLib {
-	//std::shared_ptr<SvgaVideoSpriteFrame_t>	__parse_SvgaVideoSpriteFrame_t_v2 (const com::opensource::svga::FrameEntity &_fe);
-	//std::shared_ptr<SvgaVideoSprite_t>		__parse_SvgaVideoSprite_t_v2 (const com::opensource::svga::SpriteEntity &_se);
-	//std::shared_ptr<SvgaVideo_t>			__parse_SvgaVideo_t_v1 (std::vector<uint8_t> &_movie_spec);
+	//std::shared_ptr<ISvgaVideoSpriteFrame_t>	__parse_SvgaVideoSpriteFrame_t_v2 (const com::opensource::svga::FrameEntity &_fe);
+	//std::shared_ptr<ISvgaVideoSprite_t>			__parse_SvgaVideoSprite_t_v2 (const com::opensource::svga::SpriteEntity &_se);
+	//std::shared_ptr<ISvgaVideo_t>				__parse_SvgaVideo_t_v1 (std::vector<uint8_t> &_movie_spec);
 
-	std::shared_ptr<SvgaVideoSpriteFrame_t>	__parse_SvgaVideoSpriteFrame_t_v2 (const com::opensource::svga::FrameEntity &_fe);
-	std::shared_ptr<SvgaVideoSprite_t>		__parse_SvgaVideoSprite_t_v2 (const com::opensource::svga::SpriteEntity &_se);
-	std::shared_ptr<SvgaVideo_t>			__parse_SvgaVideo_t_v2 (const com::opensource::svga::MovieEntity &_me);
+	std::shared_ptr<ISvgaVideoSpriteFrame_t>	__parse_SvgaVideoSpriteFrame_t_v2 (const com::opensource::svga::FrameEntity &_fe);
+	std::shared_ptr<ISvgaVideoSprite_t>			__parse_SvgaVideoSprite_t_v2 (const com::opensource::svga::SpriteEntity &_se);
+	std::shared_ptr<ISvgaVideo_t>				__parse_SvgaVideo_t_v2 (const com::opensource::svga::MovieEntity &_me);
 }
 
 #endif //__SVGA_PRIVATE_H__

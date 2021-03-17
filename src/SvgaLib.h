@@ -6,6 +6,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #ifdef _WIN32
@@ -34,6 +35,9 @@ namespace SvgaLib {
 		static Window_t CreatePreviewWindow (int32_t _width, int32_t _height);
 		static int Run (Window_t _wnd);
 		static bool PaintImage (Window_t _wnd, Image_t *_img);
+
+		static Image_t *CreateImage (int32_t _width, int32_t _height);
+		static void FreeImage (Image_t *_img);
 	};
 
 
@@ -56,23 +60,16 @@ namespace SvgaLib {
 	public:
 		ISvgaVideoSprite_t () = default;
 		virtual ~ISvgaVideoSprite_t () = default;
-		std::string m_image_key = "";
-		std::vector<std::shared_ptr<ISvgaVideoSpriteFrame_t>> m_frames;
 	};
 
 	class ISvgaVideo_t: public std::enable_shared_from_this<ISvgaVideo_t> {
 	public:
 		ISvgaVideo_t () = default;
 		virtual ~ISvgaVideo_t () = default;
-		virtual void StartPlay (std::function<void (Image_t*)>) = 0;
+		virtual void StartPlay (std::function<void (Image_t*)> _callback) = 0;
 		virtual void Stop () = 0;
 		virtual bool IsPlaying () = 0;
-
-		std::string m_version = "";
-		float m_width = 0.0f, m_height = 0.0f;
-		int32_t m_fps = 0, m_frames = 0;
-		std::map<std::string, Image_t*> m_images;
-		std::vector<std::shared_ptr<ISvgaVideoSprite_t>> m_sprites;
+		virtual std::tuple<float, float> GetSize () = 0;
 	};
 
 	class SvgaLoader_t {
