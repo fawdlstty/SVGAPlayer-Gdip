@@ -3,16 +3,31 @@
 
 
 namespace SvgaLib {
+	class SvgaClipPath_t {
+	public:
+		SvgaClipPath_t () = default;
+
+		bool Parse (const std::string &_spath) {
+			if (_spath == "")
+				return true;
+			// TODO
+			return false;
+		}
+
+		Gdiplus::GraphicsPath m_path;
+	};
+
+
+
 	class SvgaVideoSpriteFrameImpl_t : public ISvgaVideoSpriteFrame_t {
 	public:
 		SvgaVideoSpriteFrameImpl_t () = default;
-
 		virtual ~SvgaVideoSpriteFrameImpl_t () = default;
 
 		float m_alpha = 0.0f;
 		RectF_t m_layout;
 		Transform_t m_transform;
-		std::string m_clipPath = "";
+		SvgaClipPath_t m_clip_path;
 	};
 
 
@@ -48,7 +63,8 @@ namespace SvgaLib {
 		}
 		_ptr->m_transform = Transform_t (a, b, c, d, tx, ty);
 		//
-		_ptr->m_clipPath = _fe.clippath ();
+		if (!_ptr->m_clip_path.Parse (_fe.clippath ()))
+			return nullptr;
 		return _ptr;
 	}
 }

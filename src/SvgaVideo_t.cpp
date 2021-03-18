@@ -6,8 +6,9 @@ namespace SvgaLib {
 	class SvgaVideoImpl_t : public ISvgaVideo_t {
 	public:
 		SvgaVideoImpl_t () { m_run.store (false); }
-
 		virtual ~SvgaVideoImpl_t () { Stop (); }
+		bool IsPlaying () override { return m_run.load (); }
+		std::tuple<float, float> GetSize () override { return { m_width, m_height }; }
 
 		void StartPlay (std::function<void (Image_t *)> _callback) override {
 			Stop ();
@@ -17,9 +18,24 @@ namespace SvgaLib {
 				auto _tp = std::chrono::system_clock::now ();
 				int64_t _frame = 0;
 				while (m_run.load ()) {
-					// TODO: draw
 					Image_t *_img = ImageEngine_t::CreateImage ((int32_t) m_width, (int32_t) m_height);
+					//
+					for (size_t i = 0; i < m_sprites.size (); ++i) {
+						std::shared_ptr<ISvgaVideoSprite_t> _sprite = m_sprites [i];
+						std::shared_ptr<ISvgaVideoSpriteFrame_t> _sprite_frame = _sprite->GetFrame (_frame % _sprite->GetFrameCount ());
+						Image_t *_img = nullptr;
+						bool _dynamic = false;
+						if (m_dynamic_images.find (_sprite->GetImageKey ()) != m_dynamic_images.end ()) {
+							_dynamic = true;
+							_img = m_dynamic_images [_sprite->GetImageKey ()];
+						} else {
+							_dynamic = false;
+							_img = m_images [_sprite->GetImageKey ()];
+						}
+					}
+					//
 					m_callback (_img);
+					ImageEngine_t::FreeImage (_img);
 					++_frame;
 					std::this_thread::sleep_until (_tp + std::chrono::milliseconds (1000 * _frame / m_fps));
 				}
@@ -37,16 +53,13 @@ namespace SvgaLib {
 			}
 		}
 
-		bool IsPlaying () override { return m_run.load (); }
-
-		std::tuple<float, float> GetSize () override { return { m_width, m_height }; }
-
 		std::string m_version = "";
 		float m_width = 0.0f, m_height = 0.0f;
 		int32_t m_fps = 0, m_frames = 0;
 		std::map<std::string, Image_t *> m_images;
+		std::map<std::string, Image_t *> m_dynamic_images;
 		std::vector<std::shared_ptr<ISvgaVideoSprite_t>> m_sprites;
-
+		//
 		std::atomic<bool> m_run;
 		std::unique_ptr<std::thread> m_thread;
 		std::function<void (Image_t *)> m_callback;

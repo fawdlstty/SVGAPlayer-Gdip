@@ -24,11 +24,11 @@ namespace SvgaLib {
 		return __ImageEngine_t__get_obj ()->PaintImage (_wnd, _img);
 	}
 
-	Image_t *CreateImage (int32_t _width, int32_t _height) {
+	Image_t* ImageEngine_t::CreateImage (int32_t _width, int32_t _height) {
 		return __ImageEngine_t__get_obj ()->CreateImage (_width, _height);
 	}
 
-	void FreeImage (Image_t *_img) {
+	void ImageEngine_t::FreeImage (Image_t *_img) {
 		__ImageEngine_t__get_obj ()->FreeImage (_img);
 	}
 }

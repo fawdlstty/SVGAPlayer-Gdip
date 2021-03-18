@@ -36,7 +36,7 @@ namespace SvgaLib {
 		static int Run (Window_t _wnd);
 		static bool PaintImage (Window_t _wnd, Image_t *_img);
 
-		static Image_t *CreateImage (int32_t _width, int32_t _height);
+		static Image_t* CreateImage (int32_t _width, int32_t _height);
 		static void FreeImage (Image_t *_img);
 	};
 
@@ -50,26 +50,25 @@ namespace SvgaLib {
 	public:
 		ISvgaVideoSpriteFrame_t () = default;
 		virtual ~ISvgaVideoSpriteFrame_t () = default;
-		float m_alpha = 0.0f;
-		RectF_t m_layout;
-		Transform_t m_transform;
-		std::string m_clipPath = "";
 	};
 
 	class ISvgaVideoSprite_t: public std::enable_shared_from_this<ISvgaVideoSprite_t> {
 	public:
 		ISvgaVideoSprite_t () = default;
 		virtual ~ISvgaVideoSprite_t () = default;
+		virtual size_t GetFrameCount () = 0;
+		virtual std::shared_ptr<ISvgaVideoSpriteFrame_t> GetFrame (size_t _index) = 0;
+		virtual std::string GetImageKey () = 0;
 	};
 
 	class ISvgaVideo_t: public std::enable_shared_from_this<ISvgaVideo_t> {
 	public:
 		ISvgaVideo_t () = default;
 		virtual ~ISvgaVideo_t () = default;
-		virtual void StartPlay (std::function<void (Image_t*)> _callback) = 0;
-		virtual void Stop () = 0;
 		virtual bool IsPlaying () = 0;
 		virtual std::tuple<float, float> GetSize () = 0;
+		virtual void StartPlay (std::function<void (Image_t*)> _callback) = 0;
+		virtual void Stop () = 0;
 	};
 
 	class SvgaLoader_t {

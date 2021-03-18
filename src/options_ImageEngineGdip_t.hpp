@@ -140,6 +140,10 @@ namespace SvgaLib {
 			if (_v.size () > 0) {
 				auto _ret = _v [_v.size () - 1];
 				_v.erase (_v.begin () + _v.size () - 1);
+				Gdiplus::BitmapData _data;
+				_ret->LockBits (&Gdiplus::Rect (0, 0, _width, _height), Gdiplus::ImageLockModeWrite, PixelFormat32bppARGB, &_data);
+				memset (_data.Scan0, 0, ((size_t) _width) * ((size_t) _height) * 4);
+				_ret->UnlockBits (&_data);
 				return _ret;
 			}
 			ul.unlock ();
