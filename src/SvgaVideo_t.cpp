@@ -3,7 +3,7 @@
 
 
 namespace SvgaLib {
-	class SvgaVideoImpl_t : public ISvgaVideo_t {
+	class SvgaVideoImpl_t: public ISvgaVideo_t {
 	public:
 		SvgaVideoImpl_t () { m_run.store (false); }
 		virtual ~SvgaVideoImpl_t () { Stop (); }
@@ -18,19 +18,45 @@ namespace SvgaLib {
 				auto _tp = std::chrono::system_clock::now ();
 				int64_t _frame = 0;
 				while (m_run.load ()) {
-					Image_t *_img = ImageEngine_t::CreateImage ((int32_t) m_width, (int32_t) m_height);
+					Image_t *_img = ImageEngine_t::CreateImage ((int32_t) m_width, (int32_t) m_height, false);
+					Gdiplus::Graphics _g (_img);
 					//
 					for (size_t i = 0; i < m_sprites.size (); ++i) {
 						std::shared_ptr<ISvgaVideoSprite_t> _sprite = m_sprites [i];
 						std::shared_ptr<ISvgaVideoSpriteFrame_t> _sprite_frame = _sprite->GetFrame (_frame % _sprite->GetFrameCount ());
-						Image_t *_img = nullptr;
+						Image_t *_img2 = nullptr;
 						bool _dynamic = false;
 						if (m_dynamic_images.find (_sprite->GetImageKey ()) != m_dynamic_images.end ()) {
 							_dynamic = true;
-							_img = m_dynamic_images [_sprite->GetImageKey ()];
+							_img2 = m_dynamic_images [_sprite->GetImageKey ()];
 						} else {
 							_dynamic = false;
-							_img = m_images [_sprite->GetImageKey ()];
+							_img2 = m_images [_sprite->GetImageKey ()];
+						}
+						ResType_t _rtype;
+						std::tie (_rtype, _img2) = _sprite_frame->Clip (_img2);
+						if (_img2) {
+							// transform
+							Transform_t _tf = _sprite_frame->GetTransform ();
+							Gdiplus::Matrix m { _tf.m_a, _tf.m_b, _tf.m_c, _tf.m_d, _tf.m_tx, _tf.m_ty };
+							_g.SetTransform (&m);
+
+							// transparent
+							Gdiplus::ColorMatrix _cm_transparent {
+								1, 0, 0, 0, 0,
+								0, 1, 0, 0, 0,
+								0, 0, 1, 0, 0,
+								0, 0, 0, _sprite_frame->GetAlpha (), 0,
+								0, 0, 0, 0, 1,
+							};
+							Gdiplus::ImageAttributes _ia_transparent;
+							_ia_transparent.SetColorMatrix (&_cm_transparent);
+
+							// draw
+							Gdiplus::Rect _dest_rect { 0, 0, (INT) _img2->GetWidth (), (INT) _img2->GetHeight () };
+							_g.DrawImage (_img2, _dest_rect, 0, 0, _dest_rect.Width, _dest_rect.Height, Gdiplus::UnitPixel, &_ia_transparent);
+							if (_rtype == ResType_t::NeedRelease)
+								ImageEngine_t::FreeImage (_img2);
 						}
 					}
 					//

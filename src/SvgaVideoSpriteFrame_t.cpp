@@ -2,6 +2,27 @@
 
 
 
+std::vector<std::string> __split_comma_space (const std::string &_spath) {
+	std::vector<std::string> _v;
+	std::string _tmp = "";
+	for (int i = 0; i < _spath.size (); ++i) {
+		char _ch = _spath [i];
+		if (_ch == ',' || _ch == ' ' || _ch == '\t' || _ch == '\r' || _ch == '\n') {
+			if (_tmp != "") {
+				_v.push_back (_tmp);
+				_tmp = "";
+			}
+		} else {
+			_tmp += _ch;
+		}
+	}
+	if (_tmp != "") {
+		_v.push_back (_tmp);
+		_tmp = "";
+	}
+	return _v;
+}
+
 namespace SvgaLib {
 	class SvgaClipPath_t {
 	public:
@@ -10,19 +31,33 @@ namespace SvgaLib {
 		bool Parse (const std::string &_spath) {
 			if (_spath == "")
 				return true;
+			m_spath = _spath;
+			std::vector<std::string> _v = __split_comma_space (m_spath);
 			// TODO
-			return false;
+			return true;
 		}
 
+		std::tuple<ResType_t, Image_t *> Clip (Image_t *_src_img) {
+			if (m_spath.empty ())
+				return { ResType_t::Ignore, _src_img };
+			// TODO
+			return { ResType_t::Ignore, nullptr };
+		}
+
+	private:
+		std::string m_spath = "";
 		Gdiplus::GraphicsPath m_path;
 	};
 
 
 
-	class SvgaVideoSpriteFrameImpl_t : public ISvgaVideoSpriteFrame_t {
+	class SvgaVideoSpriteFrameImpl_t: public ISvgaVideoSpriteFrame_t {
 	public:
 		SvgaVideoSpriteFrameImpl_t () = default;
 		virtual ~SvgaVideoSpriteFrameImpl_t () = default;
+		std::tuple<ResType_t, Image_t *> Clip (Image_t *_src_img) override { return m_clip_path.Clip (_src_img); }
+		float GetAlpha () override { return m_alpha; }
+		Transform_t GetTransform () override { return m_transform; }
 
 		float m_alpha = 0.0f;
 		RectF_t m_layout;
@@ -39,7 +74,7 @@ namespace SvgaLib {
 		float y = 0.0f;
 		float w = 0.0f;
 		float h = 0.0f;
-		if (_fe.has_layout ()) 	{
+		if (_fe.has_layout ()) {
 			x = _fe.layout ().x ();
 			y = _fe.layout ().y ();
 			w = _fe.layout ().width ();

@@ -3,12 +3,12 @@
 
 
 namespace SvgaLib {
-	class SvgaVideoSpriteImpl_t : public ISvgaVideoSprite_t {
+	class SvgaVideoSpriteImpl_t: public ISvgaVideoSprite_t {
 	public:
 		SvgaVideoSpriteImpl_t () = default;
 		virtual ~SvgaVideoSpriteImpl_t () = default;
 		size_t GetFrameCount () override { return m_frames.size (); }
-		std::shared_ptr<ISvgaVideoSpriteFrame_t> GetFrame (size_t _index) override { return m_frames[_index]; }
+		std::shared_ptr<ISvgaVideoSpriteFrame_t> GetFrame (size_t _index) override { return m_frames [_index]; }
 		std::string GetImageKey () override { return m_image_key; }
 
 		std::string m_image_key = "";

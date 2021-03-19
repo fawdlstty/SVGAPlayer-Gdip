@@ -8,7 +8,7 @@ namespace SvgaLib {
 		return &s_gdip;
 	}
 
-	Image_t* ImageEngine_t::LoadFromMemory (const char *_data, size_t _size) {
+	Image_t *ImageEngine_t::LoadFromMemory (const char *_data, size_t _size) {
 		return __ImageEngine_t__get_obj ()->LoadFromMemory (_data, _size);
 	}
 
@@ -24,8 +24,8 @@ namespace SvgaLib {
 		return __ImageEngine_t__get_obj ()->PaintImage (_wnd, _img);
 	}
 
-	Image_t* ImageEngine_t::CreateImage (int32_t _width, int32_t _height) {
-		return __ImageEngine_t__get_obj ()->CreateImage (_width, _height);
+	Image_t *ImageEngine_t::CreateImage (int32_t _width, int32_t _height, bool _transparent) {
+		return __ImageEngine_t__get_obj ()->CreateImage (_width, _height, _transparent);
 	}
 
 	void ImageEngine_t::FreeImage (Image_t *_img) {

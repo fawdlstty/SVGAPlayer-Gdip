@@ -22,6 +22,8 @@ namespace SvgaLib {
 	// Platform abstraction
 	//
 
+	enum class ResType_t { Ignore, NeedRelease };
+
 #ifndef SVGALIB_IMAKEENGINE_IMPL
 	typedef void *Image_t;
 	typedef void *RectF_t;
@@ -31,12 +33,12 @@ namespace SvgaLib {
 
 	class ImageEngine_t {
 	public:
-		static Image_t* LoadFromMemory (const char *_data, size_t _size);
+		static Image_t *LoadFromMemory (const char *_data, size_t _size);
 		static Window_t CreatePreviewWindow (int32_t _width, int32_t _height);
 		static int Run (Window_t _wnd);
 		static bool PaintImage (Window_t _wnd, Image_t *_img);
 
-		static Image_t* CreateImage (int32_t _width, int32_t _height);
+		static Image_t *CreateImage (int32_t _width, int32_t _height, bool _transparent);
 		static void FreeImage (Image_t *_img);
 	};
 
@@ -50,6 +52,9 @@ namespace SvgaLib {
 	public:
 		ISvgaVideoSpriteFrame_t () = default;
 		virtual ~ISvgaVideoSpriteFrame_t () = default;
+		virtual std::tuple<ResType_t, Image_t *> Clip (Image_t *_src_img) = 0;
+		virtual float GetAlpha () = 0;
+		virtual Transform_t GetTransform () = 0;
 	};
 
 	class ISvgaVideoSprite_t: public std::enable_shared_from_this<ISvgaVideoSprite_t> {
@@ -67,7 +72,7 @@ namespace SvgaLib {
 		virtual ~ISvgaVideo_t () = default;
 		virtual bool IsPlaying () = 0;
 		virtual std::tuple<float, float> GetSize () = 0;
-		virtual void StartPlay (std::function<void (Image_t*)> _callback) = 0;
+		virtual void StartPlay (std::function<void (Image_t *)> _callback) = 0;
 		virtual void Stop () = 0;
 	};
 

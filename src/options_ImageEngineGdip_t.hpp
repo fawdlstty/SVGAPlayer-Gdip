@@ -27,11 +27,11 @@ typedef Gdiplus::Bitmap Image_t;
 typedef Gdiplus::RectF RectF_t;
 struct Transform_t {
 	Transform_t () = default;
-	Transform_t (float a, float b, float c, float d, float tx, float ty): m_a (a), m_b (b), m_c (c), m_d (d), m_tx (tx), m_ty (ty) {}
+	Transform_t (float a, float b, float c, float d, float tx, float ty) : m_a (a), m_b (b), m_c (c), m_d (d), m_tx (tx), m_ty (ty) {}
 	Transform_t (const Transform_t &_obj) {
 		std::tie (m_a, m_b, m_c, m_d, m_tx, m_ty) = std::make_tuple (_obj.m_a, _obj.m_b, _obj.m_c, _obj.m_d, _obj.m_tx, _obj.m_ty);
 	}
-	Transform_t& operator= (const Transform_t &_obj) {
+	Transform_t &operator= (const Transform_t &_obj) {
 		std::tie (m_a, m_b, m_c, m_d, m_tx, m_ty) = std::make_tuple (_obj.m_a, _obj.m_b, _obj.m_c, _obj.m_d, _obj.m_tx, _obj.m_ty);
 		return *this;
 	}
@@ -44,7 +44,7 @@ typedef HWND Window_t;
 
 
 namespace SvgaLib {
-	class ImageEngineGdip_t : public _IImageEngineSingleton_t {
+	class ImageEngineGdip_t: public _IImageEngineSingleton_t {
 	public:
 		ImageEngineGdip_t () {
 			Gdiplus::GdiplusStartupInput _input;
@@ -53,7 +53,7 @@ namespace SvgaLib {
 		}
 
 		virtual ~ImageEngineGdip_t () {
-			for (std::pair<const int64_t, std::vector<Image_t*>> &_item : m_caches) {
+			for (std::pair<const int64_t, std::vector<Image_t *>> &_item : m_caches) {
 				for (Image_t *_img : _item.second) {
 					delete _img;
 				}
@@ -67,7 +67,7 @@ namespace SvgaLib {
 			Gdiplus::GdiplusShutdown (m_token);
 		}
 
-		Gdiplus::Bitmap* LoadFromMemory (const char *_data, size_t _size) override {
+		Gdiplus::Bitmap *LoadFromMemory (const char *_data, size_t _size) override {
 			IStream *_stm = nullptr;
 			HRESULT _result = CreateStreamOnHGlobal (NULL, TRUE, &_stm);
 			if (_result == E_INVALIDARG || _result == E_OUTOFMEMORY)
@@ -131,18 +131,18 @@ namespace SvgaLib {
 			return true;
 		}
 
-		Image_t *CreateImage (int32_t _width, int32_t _height) override {
+		Image_t *CreateImage (int32_t _width, int32_t _height, bool _transparent) override {
 			std::unique_lock<std::mutex> ul (m_mtx);
 			int64_t _wh = _width | ((int64_t) _height << 32);
 			if (m_caches.find (_wh) == m_caches.end ())
 				m_caches [_wh] = std::vector<Image_t *> ();
-			auto& _v = m_caches [_wh];
+			auto &_v = m_caches [_wh];
 			if (_v.size () > 0) {
 				auto _ret = _v [_v.size () - 1];
 				_v.erase (_v.begin () + _v.size () - 1);
 				Gdiplus::BitmapData _data;
 				_ret->LockBits (&Gdiplus::Rect (0, 0, _width, _height), Gdiplus::ImageLockModeWrite, PixelFormat32bppARGB, &_data);
-				memset (_data.Scan0, 0, ((size_t) _width) * ((size_t) _height) * 4);
+				memset (_data.Scan0, (_transparent ? 0 : 255), ((size_t) _width) * ((size_t) _height) * 4);
 				_ret->UnlockBits (&_data);
 				return _ret;
 			}
