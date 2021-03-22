@@ -9,7 +9,8 @@ int main () {
 	std::thread ([_wnd] () {
 		std::chrono::milliseconds (100);
 		//auto _video = SvgaLib::SvgaLoader_t::LoadFromFile ("E:\\GitHub\\SVGA-Samples\\Rocket.svga"); // v1
-		auto _video = SvgaLib::SvgaLoader_t::LoadFromFile ("E:\\GitHub\\SVGA-Samples\\posche.svga"); // v2
+		//auto _video = SvgaLib::SvgaLoader_t::LoadFromFile ("E:\\GitHub\\SVGA-Samples\\posche.svga"); // v2  angel.svga  halloween.svga
+		auto _video = SvgaLib::SvgaLoader_t::LoadFromFile ("E:\\GitHub\\SVGA-Samples\\halloween.svga");
 		_video->StartPlay ([_wnd, _video] (Image_t *_img) {
 			if (!SvgaLib::ImageEngine_t::PaintImage (_wnd, _img)) {
 				_video->Stop ();
