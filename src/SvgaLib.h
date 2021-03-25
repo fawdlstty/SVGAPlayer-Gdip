@@ -34,7 +34,7 @@ namespace SvgaLib {
 	class ImageEngine_t {
 	public:
 		static Image_t *LoadFromMemory (const char *_data, size_t _size);
-		static Window_t CreatePreviewWindow (int32_t _width, int32_t _height);
+		static Window_t CreatePreviewWindow (int32_t _width, int32_t _height, std::function<void ()> _close_cb);
 		static int Run (Window_t _wnd);
 		static bool PaintImage (Window_t _wnd, Image_t *_img);
 

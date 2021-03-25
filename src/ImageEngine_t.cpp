@@ -12,8 +12,8 @@ namespace SvgaLib {
 		return __ImageEngine_t__get_obj ()->LoadFromMemory (_data, _size);
 	}
 
-	Window_t ImageEngine_t::CreatePreviewWindow (int32_t _width, int32_t _height) {
-		return __ImageEngine_t__get_obj ()->CreatePreviewWindow (_width, _height);
+	Window_t ImageEngine_t::CreatePreviewWindow (int32_t _width, int32_t _height, std::function<void ()> _close_cb) {
+		return __ImageEngine_t__get_obj ()->CreatePreviewWindow (_width, _height, _close_cb);
 	}
 
 	int ImageEngine_t::Run (Window_t _wnd) {

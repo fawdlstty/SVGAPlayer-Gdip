@@ -1,6 +1,7 @@
 #ifndef __OPTIONS_IMAGEENGINEGDIP_HPP__
 #define __OPTIONS_IMAGEENGINEGDIP_HPP__
 
+#include <functional>
 #include <map>
 #include <mutex>
 #include <vector>
@@ -81,7 +82,8 @@ namespace SvgaLib {
 			return _bmp;
 		}
 
-		Window_t CreatePreviewWindow (int32_t _width, int32_t _height) override {
+		Window_t CreatePreviewWindow (int32_t _width, int32_t _height, std::function<void ()> _close_cb) override {
+			m_close_cb = _close_cb;
 			if (!m_wcex.lpfnWndProc) {
 				m_wcex.style = CS_HREDRAW | CS_VREDRAW;
 				m_wcex.lpfnWndProc = WndProc;
@@ -100,7 +102,7 @@ namespace SvgaLib {
 					return NULL;
 				}
 			}
-			HWND hWnd = ::CreateWindowExA (0L, _T ("SvgaLib_Preview"), _T ("SvgaLib Preview"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, _width, _height, NULL, NULL, m_wcex.hInstance, NULL);
+			HWND hWnd = ::CreateWindowExA (0L, _T ("SvgaLib_Preview"), _T ("SvgaLib Preview"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, _width, _height, NULL, NULL, m_wcex.hInstance, this);
 			if (!hWnd)
 				return NULL;
 			::ShowWindow (hWnd, SW_SHOW);
@@ -161,12 +163,20 @@ namespace SvgaLib {
 	private:
 		ULONG_PTR m_token;
 		WNDCLASSEX m_wcex { sizeof (WNDCLASSEX) };
+		std::function<void ()> m_close_cb;
 		bool m_running = false;
 
 		std::mutex m_mtx;
 		std::map<int64_t, std::vector<Image_t *>> m_caches;
 
 		static LRESULT CALLBACK WndProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+			if (uMsg == WM_NCCREATE) {
+				::SetWindowLongPtr (hWnd, GWLP_USERDATA, (LONG_PTR) lParam);
+			} else if (uMsg == WM_CLOSE) {
+				ImageEngineGdip_t *_pThis = (ImageEngineGdip_t *) ::GetWindowLongPtr (hWnd, GWLP_USERDATA);
+				if (_pThis->m_close_cb)
+					_pThis->m_close_cb ();
+			}
 			//if (uMsg == WM_CLOSE) {
 			//	::CloseWindow (hWnd);
 			//	return ::DefWindowProc (hWnd, uMsg, wParam, lParam);

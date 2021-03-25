@@ -54,7 +54,7 @@ namespace SvgaLib {
 
 							// draw
 							Gdiplus::Rect _dest_rect { 0, 0, (INT) _img2->GetWidth (), (INT) _img2->GetHeight () };
-							_g.DrawImage (_img2, _dest_rect, 0, 0, _dest_rect.Width, _dest_rect.Height, Gdiplus::UnitPixel, &_ia_transparent);
+							_g.DrawImage (_img2, _dest_rect, 0, 0, _dest_rect.Width, _dest_rect.Height, Gdiplus::UnitPixel, (_sprite_frame->GetAlpha () < 1 ? &_ia_transparent : nullptr));
 							if (_rtype == ResType_t::NeedRelease)
 								ImageEngine_t::FreeImage (_img2);
 						}
