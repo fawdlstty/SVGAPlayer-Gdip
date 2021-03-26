@@ -26,6 +26,7 @@
 #define SVGALIB_IMAKEENGINE_IMPL ImageEngineGdip_t
 typedef Gdiplus::Bitmap Image_t;
 typedef Gdiplus::RectF RectF_t;
+typedef Gdiplus::PointF PointF_t;
 struct Transform_t {
 	Transform_t () = default;
 	Transform_t (float a, float b, float c, float d, float tx, float ty) : m_a (a), m_b (b), m_c (c), m_d (d), m_tx (tx), m_ty (ty) {}

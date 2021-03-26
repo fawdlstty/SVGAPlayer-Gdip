@@ -8,7 +8,7 @@ int main () {
 	std::mutex _mtx;
 	//auto _video = SvgaLib::SvgaLoader_t::LoadFromFile ("E:\\GitHub\\SVGA-Samples\\Rocket.svga"); // v1
 	//auto _video = SvgaLib::SvgaLoader_t::LoadFromFile ("E:\\GitHub\\SVGA-Samples\\posche.svga"); // v2  angel.svga  halloween.svga
-	auto _video = SvgaLib::SvgaLoader_t::LoadFromFile ("E:\\GitHub\\SVGA-Samples\\halloween.svga");
+	auto _video = SvgaLib::SvgaLoader_t::LoadFromFile ("E:\\GitHub\\SVGA-Samples\\posche.svga");
 	Window_t _wnd = SvgaLib::ImageEngine_t::CreatePreviewWindow (640, 480, [&] () {
 		std::unique_lock<std::mutex> ul (_mtx);
 		_video->Stop ();

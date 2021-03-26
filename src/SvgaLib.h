@@ -27,6 +27,7 @@ namespace SvgaLib {
 #ifndef SVGALIB_IMAKEENGINE_IMPL
 	typedef void *Image_t;
 	typedef void *RectF_t;
+	typedef void *PointF_t;
 	typedef void *Transform_t;
 	typedef void *Window_t;
 #endif
@@ -37,7 +38,7 @@ namespace SvgaLib {
 		static Window_t CreatePreviewWindow (int32_t _width, int32_t _height, std::function<void ()> _close_cb);
 		static int Run (Window_t _wnd);
 		static bool PaintImage (Window_t _wnd, Image_t *_img);
-
+		//
 		static Image_t *CreateImage (int32_t _width, int32_t _height, bool _transparent);
 		static void FreeImage (Image_t *_img);
 	};
